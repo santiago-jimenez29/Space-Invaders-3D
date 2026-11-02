@@ -127,6 +127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   bulletPrefab: {fileID: 8055124704753309655, guid: 0c170ef3327b3c144882dc0720b92f6f, type: 3}
+  fleet: {fileID: 0}
+  explosionPrefab: {fileID: 7939343402703061190, guid: ed01da5fa64989542b9b53cb05321a35, type: 3}
   lastShot: 0
 --- !u!54 &-7438394647616666093
 Rigidbody:

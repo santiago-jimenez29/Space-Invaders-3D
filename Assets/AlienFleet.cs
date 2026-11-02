@@ -11,6 +11,7 @@ public class AlienFleet : MonoBehaviour
     public AlienCounter alienCounter;
 
     public List<GameObject> aliens = new List<GameObject> { };
+    private int initialAlienCount;
 
     float speed = .1f;
     float leftBound = -16;
@@ -18,10 +19,13 @@ public class AlienFleet : MonoBehaviour
     float lowerBound = 4.8f;
     float downTime = .1f;
     bool movingDown = false;
+    float gameOverY = -5.5f;
+    bool gameOver = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        
         for (int i = 0; i < 10; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -32,21 +36,38 @@ public class AlienFleet : MonoBehaviour
                 alien.GetComponent<Alien>().fleet = this;
             }
         }
-
+        initialAlienCount = aliens.Count;
     }
 
     // Update is called once per frame
     void Update()
     {
         alienCounter.score = aliens.Count;
+         // Check whether all aliens have been destroyed
+        if (initialAlienCount > 0 && aliens.Count == 0 && !gameOver)
+        {
+            gameOver = true;
+
+            // Tell GameManager the player won
+            GameManager.Instance.EndGame(true);
+        }
     }
 
     void FixedUpdate()
     {
+        // Determine the leftmost and rightmost aliens
+        float left = float.PositiveInfinity;
+        float right = float.NegativeInfinity;
+
+        // Adjust speed based on the number of destroyed aliens
+        int destroyedAliens = initialAlienCount - aliens.Count;
+        float newSpeed = 0.1f + (destroyedAliens * 0.005f);
+        speed = Mathf.Sign(speed) * newSpeed;
+
         //move all aliens
         foreach (GameObject alien in aliens)
         {
-            Vector3 position = alien.transform.position;
+                        Vector3 position = alien.transform.position;
             if (!movingDown)
             {
                 position.x += speed;
@@ -61,22 +82,19 @@ public class AlienFleet : MonoBehaviour
                 }*/
             }
             alien.transform.position = position;
+            left = Mathf.Min(left, position.x);
+            right = Mathf.Max(right, position.x);
+            if (position.y <= gameOverY && !gameOver)
+            {
+                gameOver = true;
+
+                // Tell GameManager that the player lost
+                GameManager.Instance.EndGame(false);
+
+                return;
+            }
         }
 
-        //change alien direction
-        float left = 0, right = 0;
-        foreach (GameObject alien in aliens)
-        {
-            Vector3 position = alien.transform.position;
-            if (position.x > right)
-            {
-                right = position.x;
-            }
-            if (position.x < left)
-            {
-                left = position.x;
-            }
-        }
         if (speed > 0 && right >= rightBound || speed < 0 && left <= leftBound)
         {
             speed = -speed;

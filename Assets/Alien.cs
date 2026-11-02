@@ -6,8 +6,9 @@ public class Alien : MonoBehaviour
 
     public GameObject bulletPrefab;
     public AlienFleet fleet;
+    public GameObject explosionPrefab;
     
-    static float bulletSpawnRate = .002f;
+    static float bulletSpawnRate = .003f;
     public float lastShot = 0;
     public static float shotCooldown = .1f;
 
@@ -34,10 +35,25 @@ public class Alien : MonoBehaviour
         }
     }
 
+    
     void OnCollisionEnter(Collision coll)
     {
-        fleet.GetComponent<AlienFleet>().aliens.Remove(gameObject);
+        // Spawn an explosion at the alien's position
+        if (explosionPrefab != null)
+        {
+            Instantiate(
+                explosionPrefab,
+                transform.position,
+                Quaternion.identity
+            );
+        }
+
+        // Remove the alien from the fleet
+        fleet.aliens.Remove(gameObject);
+
+        // Destroy the alien and the object that hit it
         Destroy(gameObject);
         Destroy(coll.gameObject);
     }
+
 }

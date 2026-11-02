@@ -28,9 +28,21 @@ public class AlienBullet : MonoBehaviour
         }
     }
 
+    
     void OnCollisionEnter(Collision coll)
     {
+        Spaceship spaceship =
+            coll.gameObject.GetComponentInParent<Spaceship>();
+
+        if (spaceship != null)
+        {
+            spaceship.TakeDamage();
+            Destroy(gameObject);
+            return;
+        }
+
         Destroy(gameObject);
         Destroy(coll.gameObject);
     }
+
 }
